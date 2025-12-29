@@ -457,11 +457,11 @@ function App() {
       </nav>
 
       <nav className="nav">
-        <div className="flex gap-12">
-          <a href="#about">소개</a>
-          <a href="#awards">수상</a>
-          <a href="#projects">프로젝트</a>
-          <a href="#team">팀</a>
+        <div className="flex gap-8 md:gap-12">
+          <a href="#about">Impact</a>
+          <a href="#team">Team</a>
+          <a href="#projects">Projects</a>
+          <a href="#retrospective">Retrospective</a>
         </div>
         <span className="nav-title">RE:WIND 2025</span>
       </nav>
@@ -504,11 +504,11 @@ function App() {
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-12 md:col-span-5">
               <p className="text-caption opacity-40 mb-6 fade-up">2025년, 우리 팀에게 일어난 일</p>
-              <h2 className="title-large fade-up">14명의 팀이<br />1년 동안 만들어낸<br />성과들</h2>
+              <h2 className="title-large fade-up">R&D팀이<br />1년 동안 만들어낸<br />성과들</h2>
             </div>
             <div className="col-span-12 md:col-span-5 md:col-start-8">
               <p className="text-body opacity-60 fade-up">
-                14명의 팀이 1년 동안 3개의 상을 받고, 6개 대학과 손을 잡고, 메타버스부터 AI 자동제어까지 영역을 넓혔습니다.
+                우리 팀이 1년 동안 3개의 상을 받고, 7개 대학과 손을 잡고, 메타버스부터 AI 자동제어까지 영역을 넓혔습니다.
               </p>
               <p className="text-body opacity-60 mt-8 fade-up">
                 단순히 프로젝트를 완료한 게 아니라 우리만의 플랫폼 VIVEN을 생태계로 확장했고, 새로운 기술 영역에서 상업화 가능성을 증명했습니다.
@@ -637,8 +637,8 @@ function App() {
           </h2>
           <div className="grid grid-cols-12 gap-8 items-start">
             <div className="col-span-12 md:col-span-5">
-              <span className="number-huge text-black">14</span>
-              <p className="text-caption opacity-40 mt-4 fade-up">Total Members</p>
+              <h3 className="title-large text-black fade-up">Team<br />Composition</h3>
+              <p className="text-body opacity-50 mt-4 fade-up">다양한 전문성을 갖춘 팀</p>
             </div>
             <div className="col-span-12 md:col-span-5 md:col-start-8">
               <div className="list-row list-row-dark"><div><span className="text-body">개발자</span><p className="text-body opacity-50 mt-1">Unity, 백엔드, AI/ML</p></div><span className="title-medium">4</span></div>
@@ -981,7 +981,7 @@ function App() {
       </section>
 
       {/* Retrospective */}
-      <section data-section="retrospective" className="section section-black py-40 relative overflow-hidden">
+      <section data-section="retrospective" id="retrospective" className="section section-black py-40 relative overflow-hidden">
         <div className="animated-gradient animated-gradient-dark"></div>
         <div className="container relative z-10">
           <p className="text-caption opacity-50 mb-8 fade-up">PART 4. RETROSPECTIVE</p>
@@ -1048,7 +1048,7 @@ function App() {
         <div className="container text-center relative z-10">
           <p className="text-caption opacity-50 mb-8 fade-up">RE:WIND 2025</p>
           <h2 className="title-hero mb-12"><span className="split-line"><span>THANK YOU</span></span></h2>
-          <p className="title-medium opacity-60 fade-up">14명의 팀원 모두 수고하셨습니다.</p>
+          <p className="title-medium opacity-60 fade-up">R&D팀 모두 수고하셨습니다.</p>
           <div className="mt-20 fade-up"><p className="text-caption opacity-30">TWENTYOZ R&D TEAM</p></div>
         </div>
       </section>
