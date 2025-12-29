@@ -43,6 +43,7 @@ body {
 
 /* Hero Title: MASSIVE, Variable weight for animation */
 .title-hero {
+  display: inline-block;
   font-family: "Pretendard Variable", Pretendard, sans-serif;
   font-size: clamp(12rem, 24vw, 30rem);
   font-weight: var(--w-black);
@@ -50,8 +51,25 @@ body {
   letter-spacing: -0.08em;
   text-transform: uppercase;
   transform: scaleX(0.85);
-  transform-origin: left center;
+  transform-origin: center center;
   color: #fff;
+}
+
+.title-hero-dark {
+  color: #000;
+}
+
+/* Closing section title - no scaleX for proper centering */
+.title-closing {
+  display: block;
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  font-size: clamp(8rem, 16vw, 20rem);
+  font-weight: var(--w-black);
+  line-height: 1;
+  letter-spacing: -0.06em;
+  text-transform: uppercase;
+  color: #000;
+  text-align: center;
 }
 
 /* Hero title wrapper - contains all hero text */
@@ -90,7 +108,7 @@ body {
   opacity: 0.55;
   margin-bottom: 0.8rem;
   transform: scaleX(0.85);
-  transform-origin: left center;
+  transform-origin: center center;
 }
 
 .hero-sub-justified span {
@@ -102,11 +120,13 @@ body {
   width: 100%;
   height: 4px;
   background: linear-gradient(90deg,
-    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
     rgba(255, 255, 255, 0.3) 100%
   );
   margin: 1.5rem 0;
-  transform-origin: left center;
+  transform: scaleX(0.85) scaleY(0.2);
+  transform-origin: center center;
   opacity: 0;
 }
 
@@ -120,7 +140,7 @@ body {
   opacity: 0.4;
   margin-top: 0.5rem;
   transform: scaleX(0.85);
-  transform-origin: left center;
+  transform-origin: center center;
   text-align: right;
 }
 
@@ -133,6 +153,16 @@ body {
   letter-spacing: -0.01em;
 }
 
+/* Project Title: Slightly smaller, no wrap */
+.title-project {
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: clamp(4rem, 8vw, 9rem);
+  font-weight: var(--w-black);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
 /* Large Title: Strong emphasis */
 .title-large {
   font-size: clamp(3rem, 5vw, 6rem);
@@ -143,23 +173,23 @@ body {
 
 /* Medium Title - PPT subheadings */
 .title-medium {
-  font-size: clamp(2.4rem, 3vw, 4rem);
+  font-size: clamp(2.8rem, 3.5vw, 4.5rem);
   font-weight: var(--w-semibold);
   line-height: 1.3;
 }
 
 /* Body Text: readable for presentations */
 .text-body {
-  font-size: clamp(1.8rem, 2vw, 2.4rem);
+  font-size: clamp(2.2rem, 2.5vw, 3rem);
   font-weight: var(--w-light);
   line-height: 1.7;
 }
 
 /* Caption: Label text - visible but secondary */
 .text-caption {
-  font-size: clamp(1.4rem, 1.5vw, 2rem);
+  font-size: clamp(1.8rem, 2vw, 2.4rem);
   font-weight: var(--w-light);
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-bottom: 1.5rem;
 }
@@ -264,6 +294,54 @@ body {
 
 .list-row-dark {
   border-color: rgba(0,0,0,0.1);
+}
+
+/* Event Row - Compact single-line layout */
+.event-row {
+  display: flex;
+  align-items: center;
+  padding: 1.2rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  gap: 2rem;
+}
+
+.event-date {
+  font-size: clamp(1.4rem, 1.5vw, 1.8rem);
+  font-weight: var(--w-medium);
+  opacity: 0.4;
+  min-width: 6rem;
+  letter-spacing: 0.05em;
+}
+
+.event-name {
+  font-size: clamp(1.8rem, 2vw, 2.4rem);
+  font-weight: var(--w-regular);
+  opacity: 0.7;
+  flex: 1;
+}
+
+.event-info {
+  font-size: clamp(1.4rem, 1.5vw, 1.8rem);
+  font-weight: var(--w-light);
+  opacity: 0.4;
+  text-align: right;
+  min-width: 8rem;
+}
+
+.event-highlight {
+  background: rgba(0,0,0,0.03);
+  padding: 1.2rem 1.5rem;
+  margin: 0 -1.5rem;
+}
+
+.event-highlight .event-date,
+.event-highlight .event-name {
+  opacity: 1;
+  font-weight: var(--w-semibold);
+}
+
+.event-highlight .event-info {
+  opacity: 1;
 }
 
 /* ========================================

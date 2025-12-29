@@ -175,18 +175,10 @@ function App() {
         })
       })
 
-      // Hero bar animation - thickness + fill
+      // Hero bar animation - thickness only (scaleX already set in CSS)
       const heroBar = document.querySelector(".hero-bar") as HTMLElement
       if (heroBar) {
-        gsap.set(heroBar, {
-          scaleX: 0,
-          scaleY: 0.2,
-          opacity: 0,
-          transformOrigin: "left center"
-        })
-
         heroTimeline.to(heroBar, {
-          scaleX: 0.85,
           scaleY: 1,
           opacity: 1,
           duration: 1.5,
@@ -216,100 +208,139 @@ function App() {
       }, 0.9)
 
 
-      // Section titles - dramatic entrance with scrub
-      gsap.utils.toArray<HTMLElement>(".title-section .split-line span").forEach((el) => {
-        gsap.fromTo(el,
-          { y: 100, opacity: 0, scale: 0.9 },
-          {
-            y: 0, opacity: 1, scale: 1,
-            scrollTrigger: {
-              trigger: el.closest("section"),
-              start: "top 85%",
-              end: "top 35%",
-              scrub: 0.5,
-            }
-          }
-        )
-      })
+      // ========================================
+      // SECTION ANIMATIONS - Staggered entrance with replay on scroll back
+      // ========================================
 
-      // Fade up elements with scrub
-      gsap.utils.toArray<HTMLElement>(".fade-up").forEach((el) => {
-        gsap.fromTo(el,
-          { y: 60, opacity: 0 },
-          {
-            y: 0, opacity: 1,
-            scrollTrigger: {
-              trigger: el,
-              start: "top 90%",
-              end: "top 60%",
-              scrub: 0.5,
-            }
-          }
-        )
-      })
+      // Each section gets its own timeline for staggered animations
+      gsap.utils.toArray<HTMLElement>("[data-section]").forEach((section) => {
+        const sectionId = section.getAttribute("data-section")
+        if (sectionId === "hero") return // Hero has its own animation
 
-      // Number animations with scrub
-      gsap.utils.toArray<HTMLElement>(".number-huge").forEach((el) => {
-        gsap.fromTo(el,
-          { scale: 0.5, opacity: 0, y: 50 },
-          {
-            scale: 1, opacity: 1, y: 0,
-            scrollTrigger: {
-              trigger: el,
-              start: "top 85%",
-              end: "top 40%",
-              scrub: 0.5,
-            }
-          }
-        )
-      })
+        // Get elements in order of visual hierarchy
+        const caption = section.querySelector(".text-caption")
+        const title = section.querySelector(".title-section, .title-large, .title-hero, .title-project, .title-closing")
+        const titleSpans = section.querySelectorAll(".title-section .split-line span")
+        const subtitles = section.querySelectorAll(".title-medium")
+        const bodyTexts = section.querySelectorAll(".text-body")
+        const fadeUps = section.querySelectorAll(".fade-up")
+        const listRows = section.querySelectorAll(".list-row, .event-row")
+        const numbers = section.querySelectorAll(".number-huge")
+        const lines = section.querySelectorAll(".line-reveal")
 
-      // Line reveal animations
-      gsap.utils.toArray<HTMLElement>(".line-reveal").forEach((el) => {
-        gsap.fromTo(el,
-          { scaleX: 0, transformOrigin: "left center" },
-          {
+        // Create section timeline
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top 70%",
+            end: "top 20%",
+            toggleActions: "play none none reverse", // Play on enter, reverse on leave back
+          }
+        })
+
+        // 1. Caption first (0s)
+        if (caption) {
+          gsap.set(caption, { opacity: 0, y: 20, letterSpacing: "0.3em" })
+          tl.to(caption, {
+            opacity: 1,
+            y: 0,
+            letterSpacing: "0.12em",
+            duration: 0.6,
+            ease: "power2.out"
+          }, 0)
+        }
+
+        // 2. Title (0.2s delay)
+        if (titleSpans.length > 0) {
+          gsap.set(titleSpans, { opacity: 0, y: 80 })
+          tl.to(titleSpans, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power3.out"
+          }, 0.2)
+        } else if (title) {
+          gsap.set(title, { opacity: 0, y: 60 })
+          tl.to(title, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out"
+          }, 0.2)
+        }
+
+        // 3. Numbers (0.4s delay) - dramatic entrance
+        if (numbers.length > 0) {
+          gsap.set(numbers, { opacity: 0, scale: 0.5, y: 50 })
+          tl.to(numbers, {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 1,
+            stagger: 0.15,
+            ease: "back.out(1.2)"
+          }, 0.4)
+        }
+
+        // 4. Subtitles (0.5s delay)
+        if (subtitles.length > 0) {
+          gsap.set(subtitles, { opacity: 0, y: 40 })
+          tl.to(subtitles, {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            stagger: 0.1,
+            ease: "power2.out"
+          }, 0.5)
+        }
+
+        // 5. Line reveals (0.6s delay)
+        if (lines.length > 0) {
+          gsap.set(lines, { scaleX: 0, transformOrigin: "left center" })
+          tl.to(lines, {
             scaleX: 1,
-            scrollTrigger: {
-              trigger: el,
-              start: "top 85%",
-              end: "top 55%",
-              scrub: 0.5,
-            }
-          }
-        )
-      })
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power2.inOut"
+          }, 0.6)
+        }
 
-      // List row stagger with scrub
-      gsap.utils.toArray<HTMLElement>(".list-row").forEach((el, i) => {
-        gsap.fromTo(el,
-          { x: -40, opacity: 0 },
-          {
-            x: 0, opacity: 1,
-            scrollTrigger: {
-              trigger: el,
-              start: "top 90%",
-              end: "top 70%",
-              scrub: 0.3,
-            }
-          }
-        )
-      })
+        // 6. List rows (0.7s delay) - staggered from top
+        if (listRows.length > 0) {
+          gsap.set(listRows, { opacity: 0, x: -30 })
+          tl.to(listRows, {
+            opacity: 1,
+            x: 0,
+            duration: 0.5,
+            stagger: 0.08,
+            ease: "power2.out"
+          }, 0.7)
+        }
 
-      // Text caption - thin weight emphasis
-      gsap.utils.toArray<HTMLElement>(".text-caption").forEach((el) => {
-        gsap.fromTo(el,
-          { letterSpacing: "0.4em", opacity: 0 },
-          {
-            letterSpacing: "0.2em", opacity: 1,
-            scrollTrigger: {
-              trigger: el,
-              start: "top 92%",
-              end: "top 70%",
-              scrub: 0.5,
-            }
-          }
-        )
+        // 7. Fade up elements (0.5s delay) - general content
+        if (fadeUps.length > 0) {
+          gsap.set(fadeUps, { opacity: 0, y: 40 })
+          tl.to(fadeUps, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: "power2.out"
+          }, 0.5)
+        }
+
+        // 8. Body texts last (0.8s delay)
+        if (bodyTexts.length > 0 && !section.querySelector(".fade-up")) {
+          gsap.set(bodyTexts, { opacity: 0, y: 30 })
+          tl.to(bodyTexts, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.05,
+            ease: "power2.out"
+          }, 0.8)
+        }
       })
 
     }, containerRef)
@@ -560,9 +591,9 @@ function App() {
       <section data-section="project-1" className="section section-white py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-4">
+            <div className="col-span-12 md:col-span-5">
               <p className="text-caption opacity-40 mb-8 fade-up">01</p>
-              <h3 className="title-section mb-4"><span className="split-line"><span>판타지아</span></span></h3>
+              <h3 className="title-project mb-4 fade-up">판타지아</h3>
               <p className="title-medium opacity-60 fade-up">금융교육게임</p>
               <p className="text-caption opacity-40 mt-8 fade-up">최우수상 + 교육부장관상</p>
             </div>
@@ -584,9 +615,9 @@ function App() {
       <section data-section="project-2" className="section section-black py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-4">
+            <div className="col-span-12 md:col-span-5">
               <p className="text-caption opacity-50 mb-8 fade-up">02</p>
-              <h3 className="title-section mb-4"><span className="split-line"><span>고미의</span></span><br /><span className="split-line"><span>심리상담 섬</span></span></h3>
+              <h3 className="title-project mb-4 fade-up">고미의<br />심리상담 섬</h3>
               <p className="title-medium opacity-60 fade-up">한신대 BA 심리상담</p>
               <p className="text-caption opacity-50 mt-8 fade-up">학술연구 장려상</p>
             </div>
@@ -614,9 +645,9 @@ function App() {
       <section data-section="project-3" className="section section-white py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-4">
+            <div className="col-span-12 md:col-span-5">
               <p className="text-caption opacity-40 mb-8 fade-up">03</p>
-              <h3 className="title-section mb-4"><span className="split-line"><span>AI 창의</span></span><br /><span className="split-line"><span>교육콘텐츠</span></span></h3>
+              <h3 className="title-project mb-4 fade-up">AI 창의<br />교육콘텐츠</h3>
               <p className="title-medium opacity-60 fade-up">경희대학교</p>
             </div>
             <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6">
@@ -645,9 +676,9 @@ function App() {
       <section data-section="project-4" className="section section-black py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-4">
+            <div className="col-span-12 md:col-span-5">
               <p className="text-caption opacity-50 mb-8 fade-up">04</p>
-              <h3 className="title-section mb-4"><span className="split-line"><span>ACU-DEX</span></span><br /><span className="split-line"><span>침술 VR</span></span></h3>
+              <h3 className="title-project mb-4 fade-up">ACU-DEX<br />침술 VR</h3>
               <p className="title-medium opacity-60 fade-up">대구한의대학교</p>
               <p className="text-caption opacity-50 mt-8 fade-up">K-MEDI 실크로드</p>
             </div>
@@ -669,9 +700,9 @@ function App() {
       <section data-section="project-5" className="section section-white py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-4">
+            <div className="col-span-12 md:col-span-5">
               <p className="text-caption opacity-40 mb-8 fade-up">05</p>
-              <h3 className="title-section mb-4"><span className="split-line"><span>콘텐츠진흥원</span></span><br /><span className="split-line"><span>햅틱 과제</span></span></h3>
+              <h3 className="title-project mb-4 fade-up">콘텐츠진흥원<br />햅틱 과제</h3>
               <p className="title-medium opacity-60 fade-up">3차년도 완료</p>
             </div>
             <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6">
@@ -717,16 +748,16 @@ function App() {
       <section data-section="events" className="section section-white py-40">
         <div className="container">
           <p className="text-caption opacity-40 mb-8 fade-up">Events</p>
-          <h2 className="title-section mb-20"><span className="split-line"><span>2025년 주요 행사</span></span></h2>
+          <h2 className="title-section mb-16"><span className="split-line"><span>2025년 주요 행사</span></span></h2>
           <div className="space-y-0">
-            <div className="list-row list-row-dark"><div><p className="text-caption opacity-40">07-11</p><p className="text-body opacity-60">크리에이터 미디어 산업대전</p></div><p className="text-body opacity-40">인천</p></div>
-            <div className="list-row list-row-dark"><div><p className="text-caption opacity-40">08-21</p><p className="text-body opacity-60">가상융합혁신인재 심포지엄</p></div><p className="text-body opacity-40">-</p></div>
-            <div className="list-row list-row-dark"><div><p className="text-caption opacity-40">10-18</p><p className="text-body opacity-60">중앙대 We-meet 본사 탐방</p></div><p className="text-body opacity-40">120분</p></div>
-            <div className="list-row list-row-dark"><div><p className="text-caption opacity-40">10-21</p><p className="text-body opacity-60">건국대 메타버스 스튜디오 시연</p></div><p className="text-body opacity-40">-</p></div>
-            <div className="list-row list-row-dark"><div><p className="text-caption opacity-40">11-12</p><p className="text-body opacity-60">대한민국 가상융합대전 KMF</p></div><p className="text-body opacity-40">-</p></div>
-            <div className="list-row list-row-dark"><div><p className="text-caption opacity-40">11-21</p><p className="text-body opacity-60">대한민국 AI교육 페스티벌</p></div><p className="text-body opacity-40">-</p></div>
-            <div className="list-row list-row-dark"><div><p className="text-caption text-black">11-26</p><p className="title-medium">CO-SHOW</p></div><p className="title-medium">장관상</p></div>
-            <div className="list-row list-row-dark border-b-0"><div><p className="text-caption opacity-40">12-22</p><p className="text-body opacity-60">경희대 워크숍</p></div><p className="text-body opacity-40">레벨디자인</p></div>
+            <div className="event-row"><span className="event-date">07-11</span><span className="event-name">크리에이터 미디어 산업대전</span><span className="event-info">인천</span></div>
+            <div className="event-row"><span className="event-date">08-21</span><span className="event-name">가상융합혁신인재 심포지엄</span><span className="event-info">—</span></div>
+            <div className="event-row"><span className="event-date">10-18</span><span className="event-name">중앙대 We-meet 본사 탐방</span><span className="event-info">120분</span></div>
+            <div className="event-row"><span className="event-date">10-21</span><span className="event-name">건국대 메타버스 스튜디오 시연</span><span className="event-info">—</span></div>
+            <div className="event-row"><span className="event-date">11-12</span><span className="event-name">대한민국 가상융합대전 KMF</span><span className="event-info">—</span></div>
+            <div className="event-row"><span className="event-date">11-21</span><span className="event-name">대한민국 AI교육 페스티벌</span><span className="event-info">—</span></div>
+            <div className="event-row event-highlight"><span className="event-date">11-26</span><span className="event-name">CO-SHOW 실감미디어</span><span className="event-info font-bold">장관상</span></div>
+            <div className="event-row border-b-0"><span className="event-date">12-22</span><span className="event-name">경희대 워크숍</span><span className="event-info">레벨디자인</span></div>
           </div>
         </div>
       </section>
@@ -825,10 +856,7 @@ function App() {
       <section data-section="closing" className="section section-white py-40">
         <div className="container text-center">
           <p className="text-caption opacity-40 mb-8 fade-up">PART 5. CLOSING</p>
-          <h2 className="title-hero text-black mb-8">
-            <span className="split-line"><span>BEYOND</span></span><br />
-            <span className="split-line"><span>BOUNDARIES</span></span>
-          </h2>
+          <h2 className="title-closing mb-8 fade-up">BEYOND<br />BOUNDARIES</h2>
           <div className="h-[1px] bg-black/10 w-24 mx-auto my-12 line-reveal"></div>
           <p className="title-large opacity-60 max-w-[60rem] mx-auto fade-up">"경계를 넘어, 새로운 가능성을 증명한 한 해"</p>
           <div className="mt-12 space-y-2 fade-up">
