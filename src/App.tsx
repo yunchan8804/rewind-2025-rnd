@@ -1,12 +1,89 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import "./index.css"
 
 gsap.registerPlugin(ScrollTrigger)
 
+const SECTIONS = [
+  { id: "hero", label: "RE:WIND" },
+  { id: "about", label: "소개" },
+  { id: "impact", label: "Impact" },
+  { id: "awards", label: "수상" },
+  { id: "expansion", label: "확장" },
+  { id: "team", label: "팀" },
+  { id: "viven", label: "VIVEN" },
+  { id: "tech", label: "기술" },
+  { id: "projects", label: "프로젝트" },
+  { id: "project-1", label: "판타지아" },
+  { id: "project-2", label: "심리상담" },
+  { id: "project-3", label: "AI교육" },
+  { id: "project-4", label: "침술VR" },
+  { id: "project-5", label: "햅틱" },
+  { id: "project-etc", label: "기타" },
+  { id: "events", label: "행사" },
+  { id: "partnership", label: "협력" },
+  { id: "summary", label: "현황" },
+  { id: "retrospective", label: "회고" },
+  { id: "closing", label: "마무리" },
+  { id: "thankyou", label: "감사" },
+  { id: "qna", label: "Q&A" },
+]
+
 function App() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [activeSection, setActiveSection] = useState(0)
+
+  useEffect(() => {
+    // Track active section
+    const sections = document.querySelectorAll("[data-section]")
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = Array.from(sections).indexOf(entry.target as Element)
+            setActiveSection(index)
+          }
+        })
+      },
+      { threshold: 0.5 }
+    )
+    sections.forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
+  }, [])
+
+  // Wheel event for single scroll = next/prev section
+  useEffect(() => {
+    let isScrolling = false
+    let currentIndex = 0
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault()
+
+      if (isScrolling) return
+
+      const sections = document.querySelectorAll("[data-section]")
+      const direction = e.deltaY > 0 ? 1 : -1
+      currentIndex = Math.max(0, Math.min(sections.length - 1, activeSection + direction))
+
+      if (currentIndex !== activeSection) {
+        isScrolling = true
+        sections[currentIndex]?.scrollIntoView({ behavior: "smooth" })
+
+        setTimeout(() => {
+          isScrolling = false
+        }, 800)
+      }
+    }
+
+    window.addEventListener("wheel", handleWheel, { passive: false })
+    return () => window.removeEventListener("wheel", handleWheel)
+  }, [activeSection])
+
+  const scrollToSection = (index: number) => {
+    const sections = document.querySelectorAll("[data-section]")
+    sections[index]?.scrollIntoView({ behavior: "smooth" })
+  }
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -129,6 +206,18 @@ function App() {
 
   return (
     <div ref={containerRef} className="bg-black text-white">
+      {/* Page Indicator */}
+      <nav className="page-indicator">
+        {SECTIONS.map((section, index) => (
+          <button
+            key={section.id}
+            className={`page-indicator-dot ${activeSection === index ? "active" : ""}`}
+            onClick={() => scrollToSection(index)}
+            title={section.label}
+          />
+        ))}
+      </nav>
+
       <nav className="nav">
         <div className="flex gap-12">
           <a href="#about">소개</a>
@@ -140,7 +229,7 @@ function App() {
       </nav>
 
       {/* Hero Title - RE:WIND 2025 */}
-      <section className="section section-black min-h-screen flex items-center justify-center py-0">
+      <section data-section="hero" className="section section-black min-h-screen flex items-center justify-center py-0">
         <div className="container-full text-center px-8">
           <p className="title-hero-sub opacity-60 mb-6 fade-up">
             TWENTYOZ  R&D  TEAM
@@ -155,7 +244,7 @@ function App() {
       </section>
 
       {/* Opening Hook */}
-      <section id="about" className="section section-white py-40">
+      <section data-section="about" id="about" className="section section-white py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-12 md:col-span-5">
@@ -175,7 +264,7 @@ function App() {
       </section>
 
       {/* Impact Numbers */}
-      <section className="section section-black py-40">
+      <section data-section="impact" className="section section-black py-40">
         <div className="container">
           <p className="text-caption opacity-50 mb-16 text-center fade-up">PART 1. IMPACT</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
@@ -199,7 +288,7 @@ function App() {
       </section>
 
       {/* Awards */}
-      <section id="awards" className="section section-white py-40">
+      <section data-section="awards" id="awards" className="section section-white py-40">
         <div className="container">
           <p className="text-caption opacity-40 mb-8 fade-up">Awards 2025</p>
           <h2 className="title-section mb-20">
@@ -223,7 +312,7 @@ function App() {
       </section>
 
       {/* Business Expansion */}
-      <section className="section section-black py-40">
+      <section data-section="expansion" className="section section-black py-40">
         <div className="container">
           <p className="text-caption opacity-50 mb-8 fade-up">Business Expansion</p>
           <h2 className="title-section mb-16">
@@ -257,7 +346,7 @@ function App() {
       </section>
 
       {/* Team */}
-      <section id="team" className="section section-white py-40">
+      <section data-section="team" id="team" className="section section-white py-40">
         <div className="container">
           <p className="text-caption opacity-40 mb-8 fade-up">PART 2. TEAM</p>
           <h2 className="title-section mb-20">
@@ -279,7 +368,7 @@ function App() {
       </section>
 
       {/* VIVEN Platform */}
-      <section className="section section-black py-40">
+      <section data-section="viven" className="section section-black py-40">
         <div className="container">
           <p className="text-caption opacity-50 mb-8 fade-up">Platform</p>
           <h2 className="title-section mb-8"><span className="split-line"><span>VIVEN</span></span></h2>
@@ -307,7 +396,7 @@ function App() {
       </section>
 
       {/* Tech Stack */}
-      <section className="section section-white py-40">
+      <section data-section="tech" className="section section-white py-40">
         <div className="container">
           <p className="text-caption opacity-40 mb-8 fade-up">Technology</p>
           <h2 className="title-section mb-20"><span className="split-line"><span>기술 스택</span></span></h2>
@@ -338,7 +427,7 @@ function App() {
       </section>
 
       {/* Projects Header */}
-      <section id="projects" className="section section-black py-40">
+      <section data-section="projects" id="projects" className="section section-black py-40">
         <div className="container">
           <p className="text-caption opacity-50 mb-8 fade-up">PART 3. PROJECTS</p>
           <h2 className="title-section">
@@ -350,7 +439,7 @@ function App() {
       </section>
 
       {/* Project 1: Fantasia */}
-      <section className="section section-white py-40">
+      <section data-section="project-1" className="section section-white py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-12 md:col-span-4">
@@ -374,7 +463,7 @@ function App() {
       </section>
 
       {/* Project 2: Psychology Island */}
-      <section className="section section-black py-40">
+      <section data-section="project-2" className="section section-black py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-12 md:col-span-4">
@@ -404,7 +493,7 @@ function App() {
       </section>
 
       {/* Project 3: AI Creative Education */}
-      <section className="section section-white py-40">
+      <section data-section="project-3" className="section section-white py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-12 md:col-span-4">
@@ -435,7 +524,7 @@ function App() {
       </section>
 
       {/* Project 4: ACU-DEX */}
-      <section className="section section-black py-40">
+      <section data-section="project-4" className="section section-black py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-12 md:col-span-4">
@@ -459,7 +548,7 @@ function App() {
       </section>
 
       {/* Project 5: Haptic */}
-      <section className="section section-white py-40">
+      <section data-section="project-5" className="section section-white py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-12 md:col-span-4">
@@ -481,7 +570,7 @@ function App() {
       </section>
 
       {/* Project 6-8: Smaller Projects */}
-      <section className="section section-black py-40">
+      <section data-section="project-etc" className="section section-black py-40">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="fade-up">
@@ -507,7 +596,7 @@ function App() {
       </section>
 
       {/* Events */}
-      <section className="section section-white py-40">
+      <section data-section="events" className="section section-white py-40">
         <div className="container">
           <p className="text-caption opacity-40 mb-8 fade-up">Events</p>
           <h2 className="title-section mb-20"><span className="split-line"><span>2025년 주요 행사</span></span></h2>
@@ -525,7 +614,7 @@ function App() {
       </section>
 
       {/* Partnership */}
-      <section className="section section-black py-40">
+      <section data-section="partnership" className="section section-black py-40">
         <div className="container">
           <p className="text-caption opacity-50 mb-8 fade-up">Partnership</p>
           <h2 className="title-section mb-20"><span className="split-line"><span>산학협력 현황</span></span></h2>
@@ -550,7 +639,7 @@ function App() {
       </section>
 
       {/* Summary */}
-      <section className="section section-white py-40">
+      <section data-section="summary" className="section section-white py-40">
         <div className="container">
           <p className="text-caption opacity-40 mb-8 fade-up">Summary</p>
           <h2 className="title-section mb-20"><span className="split-line"><span>프로젝트 현황</span></span></h2>
@@ -579,7 +668,7 @@ function App() {
       </section>
 
       {/* Retrospective */}
-      <section className="section section-black py-40">
+      <section data-section="retrospective" className="section section-black py-40">
         <div className="container">
           <p className="text-caption opacity-50 mb-8 fade-up">PART 4. RETROSPECTIVE</p>
           <h2 className="title-section mb-20"><span className="split-line"><span>회고</span></span></h2>
@@ -615,7 +704,7 @@ function App() {
       </section>
 
       {/* Closing */}
-      <section className="section section-white py-40">
+      <section data-section="closing" className="section section-white py-40">
         <div className="container text-center">
           <p className="text-caption opacity-40 mb-8 fade-up">PART 5. CLOSING</p>
           <h2 className="title-hero text-black mb-8">
@@ -633,7 +722,7 @@ function App() {
       </section>
 
       {/* Thank You */}
-      <section className="section section-black py-40 min-h-screen flex items-center justify-center">
+      <section data-section="thankyou" className="section section-black py-40 min-h-screen flex items-center justify-center">
         <div className="container text-center">
           <p className="text-caption opacity-50 mb-8 fade-up">RE:WIND 2025</p>
           <h2 className="title-hero mb-12"><span className="split-line"><span>THANK YOU</span></span></h2>
@@ -643,7 +732,7 @@ function App() {
       </section>
 
       {/* Q&A */}
-      <section className="section section-white py-40">
+      <section data-section="qna" className="section section-white py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-12 md:col-span-5">
@@ -662,7 +751,6 @@ function App() {
         </div>
       </section>
 
-      <div className="scroll-hint fade-up">↓ Scroll to RE:WIND</div>
     </div>
   )
 }
