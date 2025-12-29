@@ -19,12 +19,17 @@ const SECTIONS = [
   { id: "tech", label: "기술" },
   { id: "projects", label: "프로젝트" },
   { id: "project-1", label: "판타지아" },
+  { id: "project-1-gallery", label: "갤러리" },
   { id: "project-2", label: "심리상담" },
+  { id: "project-2-gallery", label: "갤러리" },
   { id: "project-3", label: "AI교육" },
+  { id: "project-3-gallery", label: "갤러리" },
   { id: "project-4", label: "침술VR" },
   { id: "project-5", label: "햅틱" },
+  { id: "project-5-gallery", label: "갤러리" },
   { id: "project-etc", label: "기타" },
   { id: "events", label: "행사" },
+  { id: "events-gallery", label: "갤러리" },
   { id: "partnership", label: "협력" },
   { id: "summary", label: "현황" },
   { id: "retrospective", label: "회고" },
@@ -312,12 +317,12 @@ function App() {
         if (sectionId === "hero") return // Hero has its own animation
 
         // Get elements in order of visual hierarchy
-        const caption = section.querySelector(".text-caption")
+        const caption = section.querySelector(".text-caption:not(.fade-up *)")
         const title = section.querySelector(".title-section, .title-large, .title-hero, .title-project, .title-closing")
         const titleSpans = section.querySelectorAll(".title-section .split-line span")
-        const subtitles = section.querySelectorAll(".title-medium")
-        const bodyTexts = section.querySelectorAll(".text-body")
-        const fadeUps = section.querySelectorAll(".fade-up")
+        const subtitles = section.querySelectorAll(".title-medium.fade-up")
+        const bodyTexts = section.querySelectorAll(".text-body:not(.fade-up .text-body)")
+        const fadeUps = section.querySelectorAll(".fade-up:not(.project-details .fade-up)")
         const listRows = section.querySelectorAll(".list-row, .event-row")
         const numbers = section.querySelectorAll(".number-huge")
         const lines = section.querySelectorAll(".line-reveal")
@@ -435,6 +440,45 @@ function App() {
             ease: "power2.out"
           }, 0.8)
         }
+
+        // 9. Project thumbnails (0.6s delay) - scale + fade
+        const thumbnails = section.querySelectorAll(".project-thumbnail")
+        if (thumbnails.length > 0) {
+          gsap.set(thumbnails, { opacity: 0, scale: 0.9, y: 30 })
+          tl.to(thumbnails, {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out"
+          }, 0.6)
+        }
+
+        // 10. Project details (0.5s delay) - staggered entrance for right column content
+        const projectDetails = section.querySelector(".project-details")
+        if (projectDetails) {
+          const detailItems = projectDetails.querySelectorAll(":scope > *")
+          gsap.set(detailItems, { opacity: 0, x: 30 })
+          tl.to(detailItems, {
+            opacity: 1,
+            x: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: "power2.out"
+          }, 0.5)
+        }
+
+        // 11. Text emphasis (0.8s delay) - subtle weight transition
+        const emphasisTexts = section.querySelectorAll(".text-emphasis")
+        if (emphasisTexts.length > 0) {
+          gsap.set(emphasisTexts, { opacity: 0.4 })
+          tl.to(emphasisTexts, {
+            opacity: 1,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: "power2.out"
+          }, 0.8)
+        }
       })
 
     }, containerRef)
@@ -451,8 +495,9 @@ function App() {
             key={section.id}
             className={`page-indicator-dot ${activeSection === index ? "active" : ""}`}
             onClick={() => scrollToSection(index)}
-            title={section.label}
-          />
+          >
+            <span className="page-indicator-label">{section.label}</span>
+          </button>
         ))}
       </nav>
 
@@ -508,10 +553,10 @@ function App() {
             </div>
             <div className="col-span-12 md:col-span-5 md:col-start-8">
               <p className="text-body opacity-60 fade-up">
-                우리 팀이 1년 동안 3개의 상을 받고, 7개 대학과 손을 잡고, 메타버스부터 AI 자동제어까지 영역을 넓혔습니다.
+                우리 팀이 1년 동안 <span className="text-emphasis">3개의 상</span>을 받고, <span className="text-emphasis">7개 대학</span>과 손을 잡고, <span className="text-emphasis">메타버스</span>부터 <span className="text-emphasis">AI 자동제어</span>까지 영역을 넓혔습니다.
               </p>
               <p className="text-body opacity-60 mt-8 fade-up">
-                단순히 프로젝트를 완료한 게 아니라 우리만의 플랫폼 VIVEN을 생태계로 확장했고, 새로운 기술 영역에서 상업화 가능성을 증명했습니다.
+                단순히 프로젝트를 완료한 게 아니라 우리만의 플랫폼 <span className="text-emphasis strong">VIVEN</span>을 생태계로 확장했고, 새로운 기술 영역에서 <span className="text-emphasis strong">상업화 가능성</span>을 증명했습니다.
               </p>
             </div>
           </div>
@@ -619,11 +664,11 @@ function App() {
             </div>
           </div>
           <div className="h-[1px] bg-white/10 w-full my-20 line-reveal"></div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="fade-up"><p className="text-caption opacity-30 mb-2">VIVEN</p><p className="text-body opacity-60">플랫폼 고도화 → SDK 생태계 구축</p></div>
-            <div className="fade-up"><p className="text-caption opacity-30 mb-2">AI/LLM</p><p className="text-body opacity-60">데이터센터 자동제어 → 상업화 추진</p></div>
-            <div className="fade-up"><p className="text-caption opacity-30 mb-2">XR 교육</p><p className="text-body opacity-60">금융, 심리, 한의학, 문화</p></div>
-            <div className="fade-up"><p className="text-caption opacity-30 mb-2">산학협력</p><p className="text-body opacity-60">6개 대학 파트너십</p></div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16">
+            <div className="fade-up"><p className="text-caption opacity-30 mb-3">VIVEN</p><p className="text-body opacity-60">플랫폼 고도화 → SDK 생태계 구축</p></div>
+            <div className="fade-up"><p className="text-caption opacity-30 mb-3">AI/LLM</p><p className="text-body opacity-60">데이터센터 자동제어 → 상업화 추진</p></div>
+            <div className="fade-up"><p className="text-caption opacity-30 mb-3">XR 교육</p><p className="text-body opacity-60">금융, 심리, 한의학, 문화</p></div>
+            <div className="fade-up"><p className="text-caption opacity-30 mb-3">산학협력</p><p className="text-body opacity-60">6개 대학 파트너십</p></div>
           </div>
         </div>
       </section>
@@ -641,10 +686,10 @@ function App() {
               <p className="text-body opacity-50 mt-4 fade-up">다양한 전문성을 갖춘 팀</p>
             </div>
             <div className="col-span-12 md:col-span-5 md:col-start-8">
-              <div className="list-row list-row-dark"><div><span className="text-body">개발자</span><p className="text-body opacity-50 mt-1">Unity, 백엔드, AI/ML</p></div><span className="title-medium">4</span></div>
-              <div className="list-row list-row-dark"><div><span className="text-body">디자이너</span><p className="text-body opacity-50 mt-1">3D 모델링, UI/UX</p></div><span className="title-medium">4</span></div>
-              <div className="list-row list-row-dark"><div><span className="text-body">기획</span><p className="text-body opacity-50 mt-1">콘텐츠 기획, 사업 개발</p></div><span className="title-medium">3</span></div>
-              <div className="list-row list-row-dark border-b-0"><div><span className="text-body">운영</span><p className="text-body opacity-50 mt-1">PM, 일정/품질 관리</p></div><span className="title-medium">3</span></div>
+              <div className="list-row list-row-dark"><span className="text-body">개발자</span><p className="text-body opacity-50 mt-1">Unity, 백엔드, AI/ML</p></div>
+              <div className="list-row list-row-dark"><span className="text-body">디자이너</span><p className="text-body opacity-50 mt-1">3D 모델링, UI/UX</p></div>
+              <div className="list-row list-row-dark"><span className="text-body">기획</span><p className="text-body opacity-50 mt-1">콘텐츠 기획, 사업 개발</p></div>
+              <div className="list-row list-row-dark border-b-0"><span className="text-body">운영</span><p className="text-body opacity-50 mt-1">PM, 일정/품질 관리</p></div>
             </div>
           </div>
         </div>
@@ -715,9 +760,9 @@ function App() {
         <div className="container">
           <p className="text-caption opacity-50 mb-8 fade-up">PART 3. PROJECTS</p>
           <h2 className="title-section">
-            <span className="split-line"><span>5 COMPLETED</span></span>
+            <span className="split-line"><span>9 COMPLETED</span></span>
             <br />
-            <span className="split-line"><span>4 ONGOING</span></span>
+            <span className="split-line"><span>7 ONGOING</span></span>
           </h2>
         </div>
       </section>
@@ -726,13 +771,26 @@ function App() {
       <section data-section="project-1" className="section section-white py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-5">
-              <p className="text-caption opacity-40 mb-8 fade-up">01</p>
-              <h3 className="title-project mb-4 fade-up">판타지아</h3>
-              <p className="title-medium opacity-60 fade-up">금융교육게임</p>
-              <p className="text-caption opacity-40 mt-8 fade-up">최우수상 + 교육부장관상</p>
+            <div className="col-span-12 md:col-span-5 flex flex-col">
+              {/* 왼쪽 상단: 타이틀 */}
+              <div className="mb-8">
+                <p className="text-caption opacity-40 mb-8 fade-up">01</p>
+                <h3 className="title-project mb-4 fade-up">판타지아</h3>
+                <p className="title-medium opacity-60 fade-up">금융교육게임</p>
+                <p className="text-caption opacity-40 mt-8 fade-up">🏆 최우수상 + 교육부장관상</p>
+              </div>
+              {/* 왼쪽 하단: 썸네일 */}
+              <div className="mt-auto project-thumbnail">
+                <div className="relative overflow-hidden rounded-lg shadow-2xl">
+                  <img
+                    src="/images/projects/fantasia/fantasia-12.jpg"
+                    alt="판타지아 - 금융교육게임"
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6">
+            <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6 project-details">
               <div className="fade-up"><p className="text-caption opacity-40 mb-2">기간</p><p className="text-body opacity-60">2025.06.03 ~ 06.17 (약 2주)</p></div>
               <div className="fade-up"><p className="text-caption opacity-40 mb-2">클라이언트</p><p className="text-body opacity-60">경희대학교 / 금융감독원</p></div>
               <div className="fade-up"><p className="text-caption opacity-40 mb-2">플랫폼</p><p className="text-body opacity-60">VIVEN 메타버스</p></div>
@@ -746,17 +804,52 @@ function App() {
         </div>
       </section>
 
+      {/* Fantasia Gallery */}
+      <section data-section="project-1-gallery" className="gallery-section">
+        <div className="gallery-mosaic">
+          <img src="/images/projects/fantasia/fantasia-01.png" alt="판타지아" className="span-2x2" />
+          <img src="/images/projects/fantasia/fantasia-02.png" alt="판타지아" />
+          <img src="/images/projects/fantasia/fantasia-03.png" alt="판타지아" />
+          <img src="/images/projects/fantasia/fantasia-04.png" alt="판타지아" className="span-2x1" />
+          <img src="/images/projects/fantasia/fantasia-05.png" alt="판타지아" />
+          <img src="/images/projects/fantasia/fantasia-06.png" alt="판타지아" />
+          <img src="/images/projects/fantasia/fantasia-07.png" alt="판타지아" />
+          <img src="/images/projects/fantasia/fantasia-08.png" alt="판타지아" className="span-1x2" />
+          <img src="/images/projects/fantasia/fantasia-09.png" alt="판타지아" />
+          <img src="/images/projects/fantasia/fantasia-10.png" alt="판타지아" />
+          <img src="/images/projects/fantasia/fantasia-11.png" alt="판타지아" />
+          <img src="/images/projects/fantasia/fantasia-12.jpg" alt="판타지아" />
+        </div>
+        <div className="gallery-title">
+          <h3>FANTASIA</h3>
+          <p>금융교육게임 · 최우수상</p>
+        </div>
+      </section>
+
       {/* Project 2: Psychology Island */}
       <section data-section="project-2" className="section section-black py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-5">
-              <p className="text-caption opacity-50 mb-8 fade-up">02</p>
-              <h3 className="title-project mb-4 fade-up">고미의<br />심리상담 섬</h3>
-              <p className="title-medium opacity-60 fade-up">한신대 BA 심리상담</p>
-              <p className="text-caption opacity-50 mt-8 fade-up">학술연구 장려상</p>
+            <div className="col-span-12 md:col-span-5 flex flex-col">
+              {/* 왼쪽 상단: 타이틀 */}
+              <div className="mb-8">
+                <p className="text-caption opacity-50 mb-8 fade-up">02</p>
+                <h3 className="title-project mb-4 fade-up">고미의<br />심리상담 섬</h3>
+                <p className="title-medium opacity-60 fade-up">한신대 BA 심리상담</p>
+                <p className="text-caption opacity-50 mt-8 fade-up">🏆 학술연구 장려상</p>
+              </div>
+              {/* 왼쪽 하단: 썸네일 */}
+              <div className="mt-auto project-thumbnail">
+                <div className="relative overflow-hidden rounded-lg shadow-2xl">
+                  <img
+                    src="/images/projects/psychology/psychology-35.jpg"
+                    alt="고미의 심리상담 섬"
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6">
+            <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6 project-details">
               <div className="fade-up"><p className="text-caption opacity-50 mb-2">기간</p><p className="text-body opacity-60">2025.06.17 ~ 08.13 (2개월)</p></div>
               <div className="fade-up">
                 <p className="text-caption opacity-50 mb-2">5개 테마 섬 구성</p>
@@ -784,16 +877,51 @@ function App() {
         </div>
       </section>
 
+      {/* Psychology Gallery */}
+      <section data-section="project-2-gallery" className="gallery-section">
+        <div className="gallery-mosaic">
+          <img src="/images/projects/psychology/psychology-33.jpg" alt="심리상담 섬" className="span-2x2" />
+          <img src="/images/projects/psychology/psychology-21.jpg" alt="심리상담 섬" />
+          <img src="/images/projects/psychology/psychology-22.jpg" alt="심리상담 섬" />
+          <img src="/images/projects/psychology/psychology-20.jpg" alt="심리상담 섬" className="span-2x1" />
+          <img src="/images/projects/psychology/psychology-37.jpg" alt="심리상담 섬" />
+          <img src="/images/projects/psychology/psychology-38.jpg" alt="심리상담 섬" />
+          <img src="/images/projects/psychology/psychology-01.png" alt="심리상담 섬" />
+          <img src="/images/projects/psychology/psychology-05.png" alt="심리상담 섬" className="span-1x2" />
+          <img src="/images/projects/psychology/psychology-10.png" alt="심리상담 섬" />
+          <img src="/images/projects/psychology/psychology-15.png" alt="심리상담 섬" />
+          <img src="/images/projects/psychology/psychology-31.jpg" alt="심리상담 섬" />
+          <img src="/images/projects/psychology/psychology-36.jpg" alt="심리상담 섬" />
+        </div>
+        <div className="gallery-title">
+          <h3>PSYCHOLOGY</h3>
+          <p>고미의 심리상담 섬 · 5개 테마</p>
+        </div>
+      </section>
+
       {/* Project 3: AI Creative Education */}
       <section data-section="project-3" className="section section-white py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-5">
-              <p className="text-caption opacity-40 mb-8 fade-up">03</p>
-              <h3 className="title-project mb-4 fade-up">AI 창의<br />교육콘텐츠</h3>
-              <p className="title-medium opacity-60 fade-up">경희대학교</p>
+            <div className="col-span-12 md:col-span-5 flex flex-col">
+              {/* 왼쪽 상단: 타이틀 */}
+              <div className="mb-8">
+                <p className="text-caption opacity-40 mb-8 fade-up">03</p>
+                <h3 className="title-project mb-4 fade-up">AI 창의<br />교육콘텐츠</h3>
+                <p className="title-medium opacity-60 fade-up">경희대학교</p>
+              </div>
+              {/* 왼쪽 하단: 썸네일 */}
+              <div className="mt-auto project-thumbnail">
+                <div className="relative overflow-hidden rounded-lg shadow-2xl">
+                  <img
+                    src="/images/projects/creative-edu/creative-20.png"
+                    alt="AI 창의 교육콘텐츠"
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6">
+            <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6 project-details">
               <div className="fade-up"><p className="text-caption opacity-40 mb-2">기간</p><p className="text-body opacity-60">2025.09.11 ~ 12.31</p></div>
               <div className="fade-up"><p className="text-caption opacity-40 mb-2">목표</p><p className="text-body opacity-60">해외 학생 대상 한국 역사/문화 체험</p></div>
               <div className="h-[1px] bg-black/10 w-full my-8 line-reveal"></div>
@@ -823,17 +951,52 @@ function App() {
         </div>
       </section>
 
+      {/* Creative Education Gallery */}
+      <section data-section="project-3-gallery" className="gallery-section">
+        <div className="gallery-mosaic">
+          <img src="/images/projects/creative-edu/creative-15.png" alt="창의교육" className="span-2x2" />
+          <img src="/images/projects/creative-edu/creative-01.png" alt="창의교육" />
+          <img src="/images/projects/creative-edu/creative-05.png" alt="창의교육" />
+          <img src="/images/projects/creative-edu/creative-25.png" alt="창의교육" className="span-2x1" />
+          <img src="/images/projects/creative-edu/creative-30.png" alt="창의교육" />
+          <img src="/images/projects/creative-edu/creative-35.png" alt="창의교육" />
+          <img src="/images/projects/creative-edu/creative-10.png" alt="창의교육" />
+          <img src="/images/projects/creative-edu/creative-40.png" alt="창의교육" className="span-1x2" />
+          <img src="/images/projects/creative-edu/creative-18.png" alt="창의교육" />
+          <img src="/images/projects/creative-edu/creative-22.png" alt="창의교육" />
+          <img src="/images/projects/creative-edu/creative-28.png" alt="창의교육" />
+          <img src="/images/projects/creative-edu/creative-32.png" alt="창의교육" />
+        </div>
+        <div className="gallery-title">
+          <h3>CREATIVE EDU</h3>
+          <p>AI 창의 교육콘텐츠 · 5종 테마 월드</p>
+        </div>
+      </section>
+
       {/* Project 4: ACU-DEX */}
       <section data-section="project-4" className="section section-black py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-5">
-              <p className="text-caption opacity-50 mb-8 fade-up">04</p>
-              <h3 className="title-project mb-4 fade-up">ACU-DEX<br />침술 VR</h3>
-              <p className="title-medium opacity-60 fade-up">대구한의대학교</p>
-              <p className="text-caption opacity-50 mt-8 fade-up">K-MEDI 실크로드</p>
+            <div className="col-span-12 md:col-span-5 flex flex-col">
+              {/* 왼쪽 상단: 타이틀 */}
+              <div className="mb-8">
+                <p className="text-caption opacity-50 mb-8 fade-up">04</p>
+                <h3 className="title-project mb-4 fade-up">ACU-DEX<br />침술 VR</h3>
+                <p className="title-medium opacity-60 fade-up">대구한의대학교</p>
+                <p className="text-caption opacity-50 mt-8 fade-up">K-MEDI 실크로드</p>
+              </div>
+              {/* 왼쪽 하단: 유튜브 영상 자리 */}
+              <div className="mt-auto project-thumbnail">
+                <div className="relative overflow-hidden rounded-lg shadow-2xl bg-white/5 aspect-video flex items-center justify-center">
+                  {/* TODO: 유튜브 링크로 교체 */}
+                  <div className="text-center">
+                    <p className="text-caption opacity-50">▶ 영상 준비 중</p>
+                    <p className="text-body opacity-30 mt-2">YouTube Embed</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6">
+            <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6 project-details">
               <div className="fade-up"><p className="text-caption opacity-50 mb-2">기간</p><p className="text-body opacity-60">2025.11.20 ~ 2026.01.31</p></div>
               <div className="fade-up"><p className="text-caption opacity-50 mb-2">목적</p><p className="text-body opacity-60">해외 한의학 교육</p></div>
               <div className="h-[1px] bg-white/10 w-full my-8 line-reveal"></div>
@@ -851,12 +1014,25 @@ function App() {
       <section data-section="project-5" className="section section-white py-40">
         <div className="container">
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-5">
-              <p className="text-caption opacity-40 mb-8 fade-up">05</p>
-              <h3 className="title-project mb-4 fade-up">콘텐츠진흥원<br />햅틱 과제</h3>
-              <p className="title-medium opacity-60 fade-up">3차년도 완료</p>
+            <div className="col-span-12 md:col-span-5 flex flex-col">
+              {/* 왼쪽 상단: 타이틀 */}
+              <div className="mb-8">
+                <p className="text-caption opacity-40 mb-8 fade-up">05</p>
+                <h3 className="title-project mb-4 fade-up">콘텐츠진흥원<br />햅틱 과제</h3>
+                <p className="title-medium opacity-60 fade-up">3차년도 완료</p>
+              </div>
+              {/* 왼쪽 하단: 썸네일 */}
+              <div className="mt-auto project-thumbnail">
+                <div className="relative overflow-hidden rounded-lg shadow-2xl">
+                  <img
+                    src="/images/projects/kfood/kfood-07.jpg"
+                    alt="K-FOOD RUSH 햅틱"
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6">
+            <div className="col-span-12 md:col-span-6 md:col-start-7 space-y-6 project-details">
               <div className="fade-up"><p className="text-caption opacity-40 mb-2">기간</p><p className="text-body opacity-60">2023.10 ~ 2025.10 (3년)</p></div>
               <div className="fade-up"><p className="text-caption opacity-40 mb-2">연구 내용</p><p className="text-body opacity-60">햅틱 장갑 인터페이스 개발 · Unity3D SDK 및 Plugin 개발 · 가야금 연주 VR 콘텐츠 · K-food Rush 요리 콘텐츠</p></div>
               <div className="h-[1px] bg-black/10 w-full my-8 line-reveal"></div>
@@ -869,10 +1045,32 @@ function App() {
         </div>
       </section>
 
+      {/* K-FOOD RUSH Gallery */}
+      <section data-section="project-5-gallery" className="gallery-section">
+        <div className="gallery-mosaic">
+          <img src="/images/projects/kfood/kfood-01.jpg" alt="K-FOOD RUSH" className="span-2x2" />
+          <img src="/images/projects/kfood/kfood-02.png" alt="K-FOOD RUSH" />
+          <img src="/images/projects/kfood/kfood-08.png" alt="K-FOOD RUSH" />
+          <img src="/images/projects/kfood/kfood-10.png" alt="K-FOOD RUSH" className="span-2x1" />
+          <img src="/images/projects/kfood/kfood-12.png" alt="K-FOOD RUSH" />
+          <img src="/images/projects/kfood/kfood-14.png" alt="K-FOOD RUSH" />
+          <img src="/images/projects/kfood/kfood-03.jpg" alt="K-FOOD RUSH" />
+          <img src="/images/projects/kfood/kfood-16.png" alt="K-FOOD RUSH" className="span-1x2" />
+          <img src="/images/projects/kfood/kfood-04.jpg" alt="K-FOOD RUSH" />
+          <img src="/images/projects/kfood/kfood-05.jpg" alt="K-FOOD RUSH" />
+          <img src="/images/projects/kfood/kfood-17.png" alt="K-FOOD RUSH" />
+          <img src="/images/projects/kfood/kfood-18.png" alt="K-FOOD RUSH" />
+        </div>
+        <div className="gallery-title">
+          <h3>K-FOOD RUSH</h3>
+          <p>햅틱 요리 콘텐츠 · 상업화 추진</p>
+        </div>
+      </section>
+
       {/* Project 6-9: Smaller Projects */}
       <section data-section="project-etc" className="section section-black py-40">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 lg:gap-20">
             <div className="fade-up">
               <p className="text-caption opacity-50 mb-8">06</p>
               <h3 className="title-medium mb-4">K-FOOD RUSH</h3>
@@ -916,6 +1114,26 @@ function App() {
             <div className="event-row event-highlight"><span className="event-date">11-26</span><span className="event-name">CO-SHOW 실감미디어</span><span className="event-info font-bold">장관상</span></div>
             <div className="event-row border-b-0"><span className="event-date">12-22</span><span className="event-name">경희대 확산프로그램 워크숍 & 해커톤</span><span className="event-info">레벨디자인</span></div>
           </div>
+        </div>
+      </section>
+
+      {/* Events Gallery */}
+      <section data-section="events-gallery" className="gallery-section">
+        <div className="gallery-mosaic">
+          <img src="/images/events/event-01.jpg" alt="행사" className="span-2x2" />
+          <img src="/images/events/event-02.jpg" alt="행사" />
+          <img src="/images/events/event-03.jpg" alt="행사" />
+          <img src="/images/events/event-04.jpg" alt="행사" className="span-2x1" />
+          <img src="/images/events/event-05.jpg" alt="행사" />
+          <img src="/images/events/event-06.jpg" alt="행사" />
+          <img src="/images/events/event-07.jpg" alt="행사" />
+          <img src="/images/events/event-08.jpg" alt="행사" className="span-1x2" />
+          <img src="/images/events/event-09.jpg" alt="행사" />
+          <img src="/images/events/event-10.jpg" alt="행사" />
+        </div>
+        <div className="gallery-title">
+          <h3>EVENTS 2025</h3>
+          <p>7개 행사 운영 및 홍보</p>
         </div>
       </section>
 
