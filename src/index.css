@@ -1,5 +1,6 @@
-/* Variable Fonts: Inter (100-900) + Bebas Neue for display */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Bebas+Neue&family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap");
+/* Variable Fonts: Pretendard (100-900) for titles + Noto Sans KR for body */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -40,14 +41,17 @@ body {
    TYPOGRAPHY SYSTEM - Extreme Contrast
    ======================================== */
 
-/* Hero Title: MASSIVE, BLACK weight, fills screen */
+/* Hero Title: MASSIVE, Variable weight for animation */
 .title-hero {
-  font-family: "Bebas Neue", sans-serif;
-  font-size: clamp(14rem, 28vw, 35rem);
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  font-size: clamp(12rem, 24vw, 30rem);
   font-weight: var(--w-black);
   line-height: 0.9;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.08em;
   text-transform: uppercase;
+  transform: scaleX(0.85);
+  transform-origin: left center;
+  color: #fff;
 }
 
 /* Hero title wrapper - contains all hero text */
@@ -55,30 +59,69 @@ body {
   display: inline-block;
 }
 
+/* Hero Animation Performance Optimization */
+/* Initially hidden, GSAP will animate them in */
+.hero-anim-subtitle > span,
+.hero-anim-year > span {
+  display: inline-block;
+  --wght: 900;
+  font-variation-settings: "wght" var(--wght);
+  will-change: opacity, font-variation-settings;
+  opacity: 0;
+}
+
+/* RE:WIND letters */
+.hero-anim-title > span {
+  display: inline-block;
+  --wght: 900;
+  font-variation-settings: "wght" var(--wght);
+  will-change: opacity, font-variation-settings;
+  opacity: 0;
+}
+
 /* Hero subtitle - justified to match RE:WIND width */
 .hero-sub-justified {
   display: flex;
   justify-content: space-between;
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
   font-size: clamp(2rem, 3vw, 3.8rem);
   font-weight: var(--w-light);
   text-transform: uppercase;
-  opacity: 0.35;
+  opacity: 0.55;
   margin-bottom: 0.8rem;
+  transform: scaleX(0.85);
+  transform-origin: left center;
 }
 
 .hero-sub-justified span {
   display: inline-block;
 }
 
+/* Hero decorative bar */
+.hero-bar {
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  margin: 1.5rem 0;
+  transform-origin: left center;
+  opacity: 0;
+}
+
 /* Hero year - large, right aligned */
 .title-hero-year {
-  font-family: "Bebas Neue", sans-serif;
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
   font-size: clamp(6rem, 14vw, 18rem);
   font-weight: var(--w-black);
   line-height: 0.85;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.06em;
   opacity: 0.4;
   margin-top: 0.5rem;
+  transform: scaleX(0.85);
+  transform-origin: left center;
+  text-align: right;
 }
 
 /* Section Title: Bold, Large - PPT readable */
@@ -188,16 +231,23 @@ body {
 }
 
 .nav a, .nav span {
-  font-size: 1rem;
-  font-weight: var(--w-thin);
-  letter-spacing: 0.15em;
+  font-size: 1.4rem;
+  font-weight: var(--w-light);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: inherit;
   text-decoration: none;
-  opacity: 0.5;
+  opacity: 0.6;
   transition: opacity 0.4s ease;
 }
 .nav a:hover { opacity: 1; }
+
+.nav-title {
+  font-size: 1.6rem;
+  font-weight: var(--w-medium);
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
 
 /* ========================================
    LIST ITEMS

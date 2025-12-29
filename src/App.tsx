@@ -87,21 +87,134 @@ function App() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Hero title animation - scrub linked to scroll
-      gsap.utils.toArray<HTMLElement>(".title-hero .split-line span").forEach((el, i) => {
-        gsap.fromTo(el,
-          { y: 120, opacity: 0, rotateX: -45 },
-          {
-            y: 0, opacity: 1, rotateX: 0,
-            scrollTrigger: {
-              trigger: el.closest("section"),
-              start: "top 80%",
-              end: "top 20%",
-              scrub: 0.5,
-            }
-          }
-        )
+      // ========================================
+      // HERO ENTRY ANIMATION (3 seconds)
+      // Pure font-weight animation using CSS variable --wght
+      // ========================================
+      const heroTimeline = gsap.timeline()
+
+      // Subtitle (TWENTYOZ R&D TEAM)
+      const subtitleChars = gsap.utils.toArray<HTMLElement>(".hero-anim-subtitle > span:not(.mx-4)")
+
+      // Initial state - extremely thin (almost invisible line)
+      gsap.set(subtitleChars, {
+        "--wght": 100,
+        opacity: 0
       })
+
+      // Fade in first
+      heroTimeline.to(subtitleChars, {
+        opacity: 0.55,
+        duration: 0.3,
+        stagger: { each: 0.02, from: "center" }
+      }, 0)
+
+      // Weight animation: 100 → 500
+      heroTimeline.to(subtitleChars, {
+        "--wght": 500,
+        duration: 2.5,
+        stagger: { each: 0.03, from: "center" },
+        ease: "power2.out"
+      }, 0.2)
+
+      // Flicker effect during weight transition
+      subtitleChars.forEach((char, i) => {
+        heroTimeline.to(char, {
+          "--wght": 200,
+          duration: 0.08,
+          yoyo: true,
+          repeat: 3,
+          ease: "power1.inOut"
+        }, 0.4 + i * 0.015)
+      })
+
+      // Title (RE:WIND) - pure font-weight animation
+      const titleChars = gsap.utils.toArray<HTMLElement>(".hero-anim-title > span")
+
+      // Initial state - hairline thin
+      gsap.set(titleChars, {
+        "--wght": 100,
+        opacity: 0
+      })
+
+      // Fade in + Weight animation: 100 → 900 (thin line → black)
+      heroTimeline.to(titleChars, {
+        opacity: 1,
+        "--wght": 900,
+        duration: 2.8,
+        stagger: { each: 0.08, from: "start" },
+        ease: "power3.out"
+      }, 0.3)
+
+      // Flicker during weight build-up
+      titleChars.forEach((char, i) => {
+        heroTimeline.to(char, {
+          "--wght": 300,
+          duration: 0.1,
+          yoyo: true,
+          repeat: 2,
+          ease: "power1.inOut"
+        }, 0.5 + i * 0.08)
+      })
+
+      // ========================================
+      // CONTINUOUS BREATHING ANIMATION - Weight + Color
+      // ========================================
+      const titleWeightTargets = [650, 800, 550, 750, 700, 850, 600] // R E : W I N D
+      const titleColorTargets = [0.85, 0.92, 0.78, 0.88, 0.82, 0.95, 0.85]
+
+      titleChars.forEach((char, i) => {
+        gsap.to(char, {
+          "--wght": titleWeightTargets[i] || 700,
+          color: `rgba(255, 255, 255, ${titleColorTargets[i] || 0.85})`,
+          duration: 1.5 + Math.random() * 1,
+          yoyo: true,
+          repeat: -1,
+          ease: "sine.inOut",
+          delay: 3.5 + i * 0.15
+        })
+      })
+
+      // Hero bar animation - thickness + fill
+      const heroBar = document.querySelector(".hero-bar") as HTMLElement
+      if (heroBar) {
+        gsap.set(heroBar, {
+          scaleX: 0,
+          scaleY: 0.2,
+          opacity: 0,
+          transformOrigin: "left center"
+        })
+
+        heroTimeline.to(heroBar, {
+          scaleX: 0.85,
+          scaleY: 1,
+          opacity: 1,
+          duration: 1.5,
+          ease: "power2.out"
+        }, 1.5)
+      }
+
+      // Year (2025) - same pure weight animation
+      const yearChars = gsap.utils.toArray<HTMLElement>(".hero-anim-year > span")
+
+      gsap.set(yearChars, {
+        "--wght": 100,
+        opacity: 0
+      })
+
+      heroTimeline.to(yearChars, {
+        opacity: 0.5,
+        duration: 0.3,
+        stagger: { each: 0.08, from: "end" }
+      }, 0.8)
+
+      heroTimeline.to(yearChars, {
+        "--wght": 900,
+        duration: 2.2,
+        stagger: { each: 0.1, from: "end" },
+        ease: "power2.out"
+      }, 0.9)
+
 
       // Section titles - dramatic entrance with scrub
       gsap.utils.toArray<HTMLElement>(".title-section .split-line span").forEach((el) => {
@@ -225,24 +338,25 @@ function App() {
           <a href="#projects">프로젝트</a>
           <a href="#team">팀</a>
         </div>
-        <span>RE:WIND 2025</span>
+        <span className="nav-title">RE:WIND 2025</span>
       </nav>
 
       {/* Hero Title - RE:WIND 2025 */}
       <section data-section="hero" className="section section-black min-h-screen flex items-center justify-center py-0">
         <div className="hero-title-wrapper">
-          <p className="hero-sub-justified">
+          <p className="hero-sub-justified hero-anim-subtitle">
             <span>T</span><span>W</span><span>E</span><span>N</span><span>T</span><span>Y</span><span>O</span><span>Z</span>
             <span className="mx-4">&nbsp;</span>
             <span>R</span><span>&</span><span>D</span>
             <span className="mx-4">&nbsp;</span>
             <span>T</span><span>E</span><span>A</span><span>M</span>
           </p>
-          <h1 className="title-hero">
-            <span className="split-line"><span>RE:WIND</span></span>
+          <h1 className="title-hero hero-anim-title">
+            <span>R</span><span>E</span><span>:</span><span>W</span><span>I</span><span>N</span><span>D</span>
           </h1>
-          <p className="title-hero-year text-right">
-            <span className="split-line"><span>2025</span></span>
+          <div className="hero-bar"></div>
+          <p className="title-hero-year text-right hero-anim-year">
+            <span>2</span><span>0</span><span>2</span><span>5</span>
           </p>
         </div>
       </section>
