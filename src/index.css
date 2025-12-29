@@ -50,12 +50,35 @@ body {
   text-transform: uppercase;
 }
 
-/* Hero subtitle - matches hero width with wide letter-spacing */
-.title-hero-sub {
-  font-size: clamp(1.6rem, 2.5vw, 3rem);
+/* Hero title wrapper - contains all hero text */
+.hero-title-wrapper {
+  display: inline-block;
+}
+
+/* Hero subtitle - justified to match RE:WIND width */
+.hero-sub-justified {
+  display: flex;
+  justify-content: space-between;
+  font-size: clamp(2rem, 3vw, 3.8rem);
   font-weight: var(--w-light);
-  letter-spacing: 0.5em;
   text-transform: uppercase;
+  opacity: 0.35;
+  margin-bottom: 0.8rem;
+}
+
+.hero-sub-justified span {
+  display: inline-block;
+}
+
+/* Hero year - large, right aligned */
+.title-hero-year {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(6rem, 14vw, 18rem);
+  font-weight: var(--w-black);
+  line-height: 0.85;
+  letter-spacing: -0.02em;
+  opacity: 0.4;
+  margin-top: 0.5rem;
 }
 
 /* Section Title: Bold, Large - PPT readable */

@@ -230,14 +230,18 @@ function App() {
 
       {/* Hero Title - RE:WIND 2025 */}
       <section data-section="hero" className="section section-black min-h-screen flex items-center justify-center py-0">
-        <div className="container-full text-center px-8">
-          <p className="title-hero-sub opacity-60 mb-6 fade-up">
-            TWENTYOZ  R&D  TEAM
+        <div className="hero-title-wrapper">
+          <p className="hero-sub-justified">
+            <span>T</span><span>W</span><span>E</span><span>N</span><span>T</span><span>Y</span><span>O</span><span>Z</span>
+            <span className="mx-4">&nbsp;</span>
+            <span>R</span><span>&</span><span>D</span>
+            <span className="mx-4">&nbsp;</span>
+            <span>T</span><span>E</span><span>A</span><span>M</span>
           </p>
           <h1 className="title-hero">
             <span className="split-line"><span>RE:WIND</span></span>
           </h1>
-          <p className="title-section opacity-30 mt-2">
+          <p className="title-hero-year text-right">
             <span className="split-line"><span>2025</span></span>
           </p>
         </div>
