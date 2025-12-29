@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { MeshGradient } from "@mesh-gradient/react"
+import Particles, { initParticlesEngine } from "@tsparticles/react"
+import { loadSlim } from "@tsparticles/slim"
 import "./index.css"
 
 gsap.registerPlugin(ScrollTrigger)
@@ -30,9 +33,100 @@ const SECTIONS = [
   { id: "qna", label: "Q&A" },
 ]
 
+// Particles configuration for dark sections
+const particlesOptions = {
+  fullScreen: { enable: false },
+  background: { color: { value: "transparent" } },
+  fpsLimit: 60,
+  particles: {
+    color: { value: "#ffffff" },
+    links: {
+      color: "#ffffff",
+      distance: 180,
+      enable: true,
+      opacity: 0.08,
+      width: 1,
+    },
+    move: {
+      enable: true,
+      speed: 0.5,
+      direction: "none" as const,
+      random: false,
+      straight: false,
+      outModes: { default: "out" as const },
+    },
+    number: {
+      density: { enable: true, area: 800 },
+      value: 300,
+    },
+    opacity: { value: 0.25 },
+    shape: { type: "circle" },
+    size: { value: { min: 1, max: 2 } },
+  },
+  detectRetina: true,
+}
+
+// Text Spotlight Component - light follows mouse with physics
+function TextSpotlight({ text, className = '' }: { text: string, className?: string }) {
+  const textRef = useRef<HTMLHeadingElement>(null)
+  const mousePos = useRef({ x: 50, y: 50 })
+  const currentPos = useRef({ x: 50, y: 50 })
+  const rafId = useRef<number>(0)
+
+  useEffect(() => {
+    const el = textRef.current
+    if (!el) return
+
+    // Smooth lerp animation
+    const animate = () => {
+      const ease = 0.08 // Lower = more smooth/laggy
+      currentPos.current.x += (mousePos.current.x - currentPos.current.x) * ease
+      currentPos.current.y += (mousePos.current.y - currentPos.current.y) * ease
+
+      el.style.setProperty('--mouse-x', `${currentPos.current.x}%`)
+      el.style.setProperty('--mouse-y', `${currentPos.current.y}%`)
+
+      rafId.current = requestAnimationFrame(animate)
+    }
+
+    rafId.current = requestAnimationFrame(animate)
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = el.getBoundingClientRect()
+      mousePos.current.x = ((e.clientX - rect.left) / rect.width) * 100
+      mousePos.current.y = ((e.clientY - rect.top) / rect.height) * 100
+    }
+
+    el.addEventListener('mousemove', handleMouseMove)
+    return () => {
+      el.removeEventListener('mousemove', handleMouseMove)
+      cancelAnimationFrame(rafId.current)
+    }
+  }, [])
+
+  return (
+    <h2
+      ref={textRef}
+      className={`text-spotlight ${className}`}
+      data-text={text.replace(/<br\s*\/?>/gi, '\n')}
+      dangerouslySetInnerHTML={{ __html: text }}
+    />
+  )
+}
+
 function App() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [activeSection, setActiveSection] = useState(0)
+  const [particlesReady, setParticlesReady] = useState(false)
+
+  // Initialize particles engine once
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine)
+    }).then(() => {
+      setParticlesReady(true)
+    })
+  }, [])
 
   useEffect(() => {
     // Track active section
@@ -373,8 +467,19 @@ function App() {
       </nav>
 
       {/* Hero Title - RE:WIND 2025 */}
-      <section data-section="hero" className="section section-black min-h-screen flex items-center justify-center py-0">
-        <div className="hero-title-wrapper">
+      <section data-section="hero" className="section section-black min-h-screen flex items-center justify-center py-0 relative overflow-hidden">
+        {/* Mesh Gradient Background */}
+        <MeshGradient
+          className="absolute inset-0 w-full h-full opacity-50"
+          style={{ background: '#000' }}
+          options={{
+            colors: ['#1a1a1a', '#2d2d2d', '#0f0f0f', '#3a3a3a'],
+            animationSpeed: 0.3,
+            seed: 2025,
+            appearance: 'default',
+          }}
+        />
+        <div className="hero-title-wrapper relative z-10">
           <p className="hero-sub-justified hero-anim-subtitle">
             <span>T</span><span>W</span><span>E</span><span>N</span><span>T</span><span>Y</span><span>O</span><span>Z</span>
             <span className="mx-4">&nbsp;</span>
@@ -393,8 +498,9 @@ function App() {
       </section>
 
       {/* Opening Hook */}
-      <section data-section="about" id="about" className="section section-white py-40">
-        <div className="container">
+      <section data-section="about" id="about" className="section section-white py-40 relative overflow-hidden">
+        <div className="animated-gradient animated-gradient-light"></div>
+        <div className="container relative z-10">
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-12 md:col-span-5">
               <p className="text-caption opacity-40 mb-6 fade-up">2025년, 우리 팀에게 일어난 일</p>
@@ -413,32 +519,45 @@ function App() {
       </section>
 
       {/* Impact Numbers */}
-      <section data-section="impact" className="section section-black py-40">
-        <div className="container">
+      <section data-section="impact" className="section section-black py-40 relative overflow-hidden">
+        {/* Particles Background */}
+        {particlesReady && (
+          <Particles
+            className="absolute inset-0 w-full h-full"
+            options={particlesOptions}
+          />
+        )}
+        <div className="container relative z-10">
           <p className="text-caption opacity-50 mb-16 text-center fade-up">PART 1. IMPACT</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="fade-up">
               <span className="number-huge">3</span>
               <p className="text-caption opacity-50 mt-4">Awards</p>
               <p className="text-body opacity-40 mt-2">대상급 2건 포함</p>
             </div>
             <div className="fade-up">
-              <span className="number-huge">6</span>
+              <span className="number-huge">7</span>
               <p className="text-caption opacity-50 mt-4">Universities</p>
-              <p className="text-body opacity-40 mt-2">전국 주요 대학</p>
+              <p className="text-body opacity-40 mt-2">산학협력 파트너</p>
             </div>
             <div className="fade-up">
-              <span className="number-huge">14</span>
-              <p className="text-caption opacity-50 mt-4">Members</p>
-              <p className="text-body opacity-40 mt-2">개발/디자인/기획/운영</p>
+              <span className="number-huge">9</span>
+              <p className="text-caption opacity-50 mt-4">Completed</p>
+              <p className="text-body opacity-40 mt-2">완료 프로젝트</p>
+            </div>
+            <div className="fade-up">
+              <span className="number-huge">7</span>
+              <p className="text-caption opacity-50 mt-4">Ongoing</p>
+              <p className="text-body opacity-40 mt-2">진행 중</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Awards */}
-      <section data-section="awards" id="awards" className="section section-white py-40">
-        <div className="container">
+      <section data-section="awards" id="awards" className="section section-white py-40 relative overflow-hidden">
+        <div className="animated-gradient animated-gradient-light"></div>
+        <div className="container relative z-10">
           <p className="text-caption opacity-40 mb-8 fade-up">Awards 2025</p>
           <h2 className="title-section mb-20">
             <span className="split-line"><span>3관왕</span></span>
@@ -455,6 +574,21 @@ function App() {
             <div className="list-row list-row-dark border-b-0">
               <div><h3 className="title-medium">우수 학술연구 장려상</h3><p className="text-body opacity-50 mt-2">고미의 심리상담 섬</p></div>
               <div className="text-right"><p className="text-caption opacity-40">아시아휴먼서비스학회</p><p className="text-body opacity-30 mt-1">학술적 가치 인정</p></div>
+            </div>
+          </div>
+          <div className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="fade-up">
+              <p className="text-caption opacity-40 mb-6">입찰 / 외주 성과</p>
+              <div className="space-y-4">
+                <p className="text-body opacity-60">하반기 5건 제안 작성 및 수주</p>
+                <p className="text-body opacity-60">신규 고객: 대구한의대학교 콘텐츠 용역</p>
+                <p className="text-body opacity-60">지오멕스소프트 디지털트윈 모델링 외주</p>
+              </div>
+            </div>
+            <div className="fade-up">
+              <p className="text-caption opacity-40 mb-6">대학 파트너십</p>
+              <p className="text-body opacity-60">경희대 / 중앙대 / 건국대 / 계원예대 / 한양대 / 한신대 / 대구한의대</p>
+              <p className="text-body opacity-40 mt-4">7개 대학 파트너십 체결</p>
             </div>
           </div>
         </div>
@@ -517,8 +651,9 @@ function App() {
       </section>
 
       {/* VIVEN Platform */}
-      <section data-section="viven" className="section section-black py-40">
-        <div className="container">
+      <section data-section="viven" className="section section-black py-40 relative overflow-hidden">
+        <div className="animated-gradient animated-gradient-dark"></div>
+        <div className="container relative z-10">
           <p className="text-caption opacity-50 mb-8 fade-up">Platform</p>
           <h2 className="title-section mb-8"><span className="split-line"><span>VIVEN</span></span></h2>
           <p className="title-medium opacity-60 mb-20 fade-up">자체 개발 멀티플랫폼 메타버스</p>
@@ -632,9 +767,17 @@ function App() {
                 </div>
               </div>
               <div className="h-[1px] bg-white/10 w-full my-8 line-reveal"></div>
-              <div className="fade-up"><p className="text-caption opacity-50 mb-2">주요 기능</p><p className="text-body opacity-60">관리자 패널 (학생 관리, 배지 수여) · 활동기록장 시스템 · 자연 기반 저자극 디자인</p></div>
+              <div className="fade-up">
+                <p className="text-caption opacity-50 mb-4">주요 기능</p>
+                <div className="space-y-3">
+                  <p className="text-body opacity-60"><span className="opacity-40">관리자 패널</span> — 학생 이동/착석, 역할 변경, 배지 수여, 회기 전환</p>
+                  <p className="text-body opacity-60"><span className="opacity-40">학습자 인터랙션</span> — 활동기록장 팝업, 역할 라벨 UI, 콘텐츠 자동 인식</p>
+                  <p className="text-body opacity-60"><span className="opacity-40">몰입형 디자인</span> — 자연 기반 저자극 색상, 부드러운 오브젝트</p>
+                </div>
+              </div>
+              <div className="fade-up"><p className="text-caption opacity-50 mb-2">지원환경</p><p className="text-body opacity-60">PC/VR (메타버스) · 모바일 (Android/iOS)</p></div>
               <div className="p-6 border border-white/10 fade-up">
-                <p className="text-body opacity-50 italic">심리상담 전문가와 협업하여 '행동활성화(BA)' 기법을 메타버스로 구현. 학술대회에서 발표 → 학술연구 장려상 수상! 청소년센터, 상담센터 B2B 확장 논의 중.</p>
+                <p className="text-body opacity-50 italic">행동활성화(BA) 기법을 메타버스로 구현. 우울한 청소년들이 5개 테마 섬을 탐색하며 심리적 변화를 체험. 학술대회 발표 → 장려상 수상! 청소년센터/상담센터 B2B 확장 검토 중.</p>
               </div>
             </div>
           </div>
@@ -655,8 +798,8 @@ function App() {
               <div className="fade-up"><p className="text-caption opacity-40 mb-2">목표</p><p className="text-body opacity-60">해외 학생 대상 한국 역사/문화 체험</p></div>
               <div className="h-[1px] bg-black/10 w-full my-8 line-reveal"></div>
               <div className="fade-up">
-                <p className="text-caption opacity-40 mb-8">5종 테마 월드</p>
-                <div className="space-y-4">
+                <p className="text-caption opacity-40 mb-4">5종 테마 월드</p>
+                <div className="space-y-3">
                   <div className="flex justify-between"><span className="text-body opacity-60">한국 골목길</span><span className="text-body opacity-40">레트로</span></div>
                   <div className="flex justify-between"><span className="text-body opacity-60">광장</span><span className="text-body opacity-40">전통+현대</span></div>
                   <div className="flex justify-between"><span className="text-body opacity-60">판문점</span><span className="text-body opacity-40">긴장감</span></div>
@@ -664,8 +807,16 @@ function App() {
                   <div className="flex justify-between"><span className="text-body opacity-60">서울역</span><span className="text-body opacity-40">세련됨</span></div>
                 </div>
               </div>
+              <div className="fade-up">
+                <p className="text-caption opacity-40 mb-4">핵심 작업</p>
+                <div className="space-y-2">
+                  <p className="text-body opacity-50">공간별 조명 및 포스트 프로세싱 디자인</p>
+                  <p className="text-body opacity-50">고품질 3D 환경 모델링 및 텍스처</p>
+                  <p className="text-body opacity-50">메타버스용 3D 에셋 최적화</p>
+                </div>
+              </div>
               <div className="p-6 bg-black/5 fade-up">
-                <p className="text-body opacity-50 italic">해외 학생들이 "한국에 가보고 싶다"고 느끼게 만드는 것이 목표. 각 월드마다 고유한 분위기와 스토리를 담아냄. AI 에이전트 도입을 위한 확장 설계도 완료!</p>
+                <p className="text-body opacity-50 italic">해외 학생들이 "한국에 가보고 싶다"고 느끼게 만드는 것이 목표. 시대와 장소의 고유한 분위기를 재현. AI 에이전트 도입을 위한 확장 설계 완료!</p>
               </div>
             </div>
           </div>
@@ -718,27 +869,33 @@ function App() {
         </div>
       </section>
 
-      {/* Project 6-8: Smaller Projects */}
+      {/* Project 6-9: Smaller Projects */}
       <section data-section="project-etc" className="section section-black py-40">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             <div className="fade-up">
               <p className="text-caption opacity-50 mb-8">06</p>
+              <h3 className="title-medium mb-4">K-FOOD RUSH</h3>
+              <p className="text-body opacity-50">요리 햅틱 콘텐츠</p>
+              <p className="text-body opacity-40 mt-4">2025.09 ~ 10월 · 콘텐츠진흥원 문화산업 · 저작권 구미인증 진행 중 · 상업화 추진</p>
+            </div>
+            <div className="fade-up">
+              <p className="text-caption opacity-50 mb-8">07</p>
               <h3 className="title-medium mb-4">버튜버 토크 콘서트</h3>
               <p className="text-body opacity-50">경희대학교</p>
               <p className="text-body opacity-40 mt-4">메타버스 내 토크 콘서트 전용 강연장 구축. 고품질 3D 아바타 제작. VRM 변환, VSeeFace 연동.</p>
             </div>
             <div className="fade-up">
-              <p className="text-caption opacity-50 mb-8">07</p>
+              <p className="text-caption opacity-50 mb-8">08</p>
               <h3 className="title-medium mb-4">디지털 트윈</h3>
               <p className="text-body opacity-50">경희대 국제캠퍼스</p>
-              <p className="text-body opacity-40 mt-4">"경희랜드의 벚꽃 캠퍼스를 언제 어디서든" 캠퍼스 투어 콘텐츠. 우정원 및 X-Space, XR Studio 모델링.</p>
+              <p className="text-body opacity-40 mt-4">캠퍼스 투어 콘텐츠. 우정원 및 X-Space, XR Studio 모델링.</p>
             </div>
             <div className="fade-up">
-              <p className="text-caption opacity-50 mb-8">08</p>
+              <p className="text-caption opacity-50 mb-8">09</p>
               <h3 className="title-medium mb-4">RFS 자동제어</h3>
               <p className="text-body opacity-50">하남 데이터센터</p>
-              <p className="text-body opacity-40 mt-4">트랜스포머 모델 · SPH 유체 시뮬레이션 · ACS 자동제어. 상업화 추진 중!</p>
+              <p className="text-body opacity-40 mt-4">트랜스포머 모델 · LLM 기반 서버실 자동제어. 상업화 추진 중!</p>
             </div>
           </div>
         </div>
@@ -757,7 +914,7 @@ function App() {
             <div className="event-row"><span className="event-date">11-12</span><span className="event-name">대한민국 가상융합대전 KMF</span><span className="event-info">—</span></div>
             <div className="event-row"><span className="event-date">11-21</span><span className="event-name">대한민국 AI교육 페스티벌</span><span className="event-info">—</span></div>
             <div className="event-row event-highlight"><span className="event-date">11-26</span><span className="event-name">CO-SHOW 실감미디어</span><span className="event-info font-bold">장관상</span></div>
-            <div className="event-row border-b-0"><span className="event-date">12-22</span><span className="event-name">경희대 워크숍</span><span className="event-info">레벨디자인</span></div>
+            <div className="event-row border-b-0"><span className="event-date">12-22</span><span className="event-name">경희대 확산프로그램 워크숍 & 해커톤</span><span className="event-info">레벨디자인</span></div>
           </div>
         </div>
       </section>
@@ -794,22 +951,29 @@ function App() {
           <h2 className="title-section mb-20"><span className="split-line"><span>프로젝트 현황</span></span></h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
             <div>
-              <p className="text-caption opacity-40 mb-8 fade-up">완료 (5건)</p>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">판타지아 (금융교육게임) — 수상</p></div>
-                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">한신대 BA 심리상담 — 수상</p></div>
-                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">경희대 버튜버 토크 콘서트</p></div>
-                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">VIVEN 플랫폼 고도화</p></div>
-                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">RFS 내곡동 납품</p></div>
+              <p className="text-caption opacity-40 mb-8 fade-up">완료 (9건)</p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">판타지아 (금융교육게임) — 더블 수상</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">한신대 BA 심리상담 — 학술상</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">경희대 버튜버 콜로키움 행사</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">VIVEN 플랫폼 3차 고도화</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">K-FOOD RUSH 요리 콘텐츠</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">빅데이터/실감미디어 AIB 프로젝트</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">WE-MEET 1학기/2학기</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">지오멕스소프트 디지털트윈 외주</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black rounded-full"></span><p className="text-body">7개 행사 운영 및 홍보</p></div>
               </div>
             </div>
             <div>
-              <p className="text-caption opacity-40 mb-8 fade-up">진행 중 (4건)</p>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black/30 rounded-full"></span><p className="text-body opacity-60">AI 창의교육콘텐츠 (12월 완료)</p></div>
-                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black/30 rounded-full"></span><p className="text-body opacity-60">대구한의대 침술 VR (1월 완료)</p></div>
-                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black/30 rounded-full"></span><p className="text-body opacity-60">RFS 상업화</p></div>
-                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black/30 rounded-full"></span><p className="text-body opacity-60">K-food Rush 상업화</p></div>
+              <p className="text-caption opacity-40 mb-8 fade-up">진행 중 (7건)</p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black/30 rounded-full"></span><p className="text-body opacity-60">RFS 데이터센터 솔루션 & 상업화</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black/30 rounded-full"></span><p className="text-body opacity-60">LLM 기반 서버실 자동제어 시스템</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black/30 rounded-full"></span><p className="text-body opacity-60">경희대 창의 교육 콘텐츠</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black/30 rounded-full"></span><p className="text-body opacity-60">경희대 프로그래밍 교육 &lt;KHU1&gt;</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black/30 rounded-full"></span><p className="text-body opacity-60">대구한의대 침술 VR &lt;ACU-DEX&gt;</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black/30 rounded-full"></span><p className="text-body opacity-60">경희대 해커톤/워크샵/콜로키움</p></div>
+                <div className="flex items-center gap-4 fade-up"><span className="w-2 h-2 bg-black/30 rounded-full"></span><p className="text-body opacity-60">건국대학교 SHOWCASE</p></div>
               </div>
             </div>
           </div>
@@ -817,8 +981,9 @@ function App() {
       </section>
 
       {/* Retrospective */}
-      <section data-section="retrospective" className="section section-black py-40">
-        <div className="container">
+      <section data-section="retrospective" className="section section-black py-40 relative overflow-hidden">
+        <div className="animated-gradient animated-gradient-dark"></div>
+        <div className="container relative z-10">
           <p className="text-caption opacity-50 mb-8 fade-up">PART 4. RETROSPECTIVE</p>
           <h2 className="title-section mb-20"><span className="split-line"><span>회고</span></span></h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -853,10 +1018,10 @@ function App() {
       </section>
 
       {/* Closing */}
-      <section data-section="closing" className="section section-white py-40">
-        <div className="container text-center">
+      <section data-section="closing" className="section section-white py-40 relative overflow-hidden">
+        <div className="container text-center relative z-10">
           <p className="text-caption opacity-40 mb-8 fade-up">PART 5. CLOSING</p>
-          <h2 className="title-closing mb-8 fade-up">BEYOND<br />BOUNDARIES</h2>
+          <TextSpotlight text="BEYOND<br/>BOUNDARIES" className="title-closing mb-8 fade-up" />
           <div className="h-[1px] bg-black/10 w-24 mx-auto my-12 line-reveal"></div>
           <p className="title-large opacity-60 max-w-[60rem] mx-auto fade-up">"경계를 넘어, 새로운 가능성을 증명한 한 해"</p>
           <div className="mt-12 space-y-2 fade-up">
@@ -868,8 +1033,19 @@ function App() {
       </section>
 
       {/* Thank You */}
-      <section data-section="thankyou" className="section section-black py-40 min-h-screen flex items-center justify-center">
-        <div className="container text-center">
+      <section data-section="thankyou" className="section section-black py-40 min-h-screen flex items-center justify-center relative overflow-hidden">
+        {/* Mesh Gradient Background */}
+        <MeshGradient
+          className="absolute inset-0 w-full h-full opacity-50"
+          style={{ background: '#000' }}
+          options={{
+            colors: ['#2a2a2a', '#1a1a1a', '#3d3d3d', '#0f0f0f'],
+            animationSpeed: 0.2,
+            seed: 1225,
+            appearance: 'default',
+          }}
+        />
+        <div className="container text-center relative z-10">
           <p className="text-caption opacity-50 mb-8 fade-up">RE:WIND 2025</p>
           <h2 className="title-hero mb-12"><span className="split-line"><span>THANK YOU</span></span></h2>
           <p className="title-medium opacity-60 fade-up">14명의 팀원 모두 수고하셨습니다.</p>
@@ -878,22 +1054,11 @@ function App() {
       </section>
 
       {/* Q&A */}
-      <section data-section="qna" className="section section-white py-40">
-        <div className="container">
-          <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-5">
-              <p className="text-caption opacity-40 mb-8 fade-up">Q&A</p>
-              <h2 className="title-section"><span className="split-line"><span>질문</span></span><br /><span className="split-line"><span>있으신가요?</span></span></h2>
-            </div>
-            <div className="col-span-12 md:col-span-5 md:col-start-8">
-              <p className="text-caption opacity-40 mb-6 fade-up">예상 질문</p>
-              <div className="space-y-6">
-                <div className="fade-up"><p className="text-body opacity-60">VIVEN 플랫폼의 차별점은?</p></div>
-                <div className="fade-up"><p className="text-body opacity-60">AI/LLM 자동제어 상업화 일정은?</p></div>
-                <div className="fade-up"><p className="text-body opacity-60">2026년 산학협력 계획은?</p></div>
-              </div>
-            </div>
-          </div>
+      <section data-section="qna" className="section section-white py-40 min-h-screen flex items-center justify-center">
+        <div className="container text-center">
+          <p className="text-caption opacity-40 mb-8 fade-up">Q&A</p>
+          <h2 className="title-section mb-8 fade-up">질문 있으신가요?</h2>
+          <p className="text-body opacity-50 fade-up">발표 내용에 대해 궁금한 점이 있으시면 질문해주세요.</p>
         </div>
       </section>
 

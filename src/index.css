@@ -481,3 +481,199 @@ body {
     font-size: clamp(8rem, 18vw, 15rem);
   }
 }
+
+/* ========================================
+   BLUR ORBS BACKGROUND ANIMATION
+   ======================================== */
+
+.blur-orbs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blur-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  will-change: transform;
+}
+
+/* Dark theme orbs (for black sections) */
+.blur-orbs-dark .blur-orb-1 {
+  width: 70vw;
+  height: 70vw;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%);
+  top: -25%;
+  left: -25%;
+  animation: float-1 25s ease-in-out infinite;
+}
+
+.blur-orbs-dark .blur-orb-2 {
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 70%);
+  bottom: -20%;
+  right: -20%;
+  animation: float-2 30s ease-in-out infinite;
+}
+
+.blur-orbs-dark .blur-orb-3 {
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 70%);
+  top: 30%;
+  left: 40%;
+  animation: float-3 20s ease-in-out infinite;
+}
+
+/* Light theme orbs (for white sections) */
+.blur-orbs-light .blur-orb-1 {
+  width: 70vw;
+  height: 70vw;
+  background: radial-gradient(circle, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0) 70%);
+  top: -25%;
+  right: -20%;
+  animation: float-1 28s ease-in-out infinite;
+}
+
+.blur-orbs-light .blur-orb-2 {
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 70%);
+  bottom: -20%;
+  left: -20%;
+  animation: float-2 32s ease-in-out infinite;
+}
+
+.blur-orbs-light .blur-orb-3 {
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0) 70%);
+  top: 25%;
+  left: 30%;
+  animation: float-3 22s ease-in-out infinite;
+}
+
+@keyframes float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(5%, 10%) scale(1.05); }
+  50% { transform: translate(10%, 5%) scale(1); }
+  75% { transform: translate(3%, -5%) scale(0.95); }
+}
+
+@keyframes float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-8%, 5%) scale(1.08); }
+  66% { transform: translate(5%, -8%) scale(0.95); }
+}
+
+@keyframes float-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  20% { transform: translate(-5%, 8%) scale(1.1); }
+  40% { transform: translate(8%, 3%) scale(0.9); }
+  60% { transform: translate(3%, -6%) scale(1.05); }
+  80% { transform: translate(-3%, 4%) scale(0.95); }
+}
+
+/* ========================================
+   MOUSE SPOTLIGHT EFFECT
+   ======================================== */
+
+.spotlight-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.spotlight {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: transform 0.15s ease-out, opacity 0.3s ease;
+  transform: translate(-50%, -50%);
+}
+
+/* Dark theme spotlight */
+.spotlight-dark {
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 60%);
+}
+
+/* Light theme spotlight */
+.spotlight-light {
+  background: radial-gradient(circle, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0) 50%);
+}
+
+/* ========================================
+   TEXT SPOTLIGHT EFFECT (text mask)
+   ======================================== */
+
+.text-spotlight-container {
+  position: relative;
+  display: inline-block;
+}
+
+.text-spotlight {
+  background:
+    radial-gradient(
+      circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(120,120,120,1) 0%,
+      rgba(80,80,80,1) 30%,
+      rgba(40,40,40,1) 60%,
+      rgba(20,20,20,1) 100%
+    );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* ========================================
+   ANIMATED GRADIENT BACKGROUND
+   ======================================== */
+
+.animated-gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Dark theme - light colors on dark bg */
+.animated-gradient-dark {
+  background: linear-gradient(
+    -45deg,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.18),
+    rgba(200,200,200,0.12),
+    rgba(255,255,255,0.2),
+    rgba(255,255,255,0.08)
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 25s ease infinite;
+  mix-blend-mode: screen;
+}
+
+/* Light theme - dark colors on light bg */
+.animated-gradient-light {
+  background: linear-gradient(
+    -45deg,
+    rgba(0,0,0,0.04),
+    rgba(0,0,0,0.12),
+    rgba(50,50,50,0.08),
+    rgba(0,0,0,0.15),
+    rgba(0,0,0,0.04)
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 25s ease infinite;
+  mix-blend-mode: multiply;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
