@@ -140,19 +140,16 @@ function App() {
       </nav>
 
       {/* Hero Title - RE:WIND 2025 */}
-      <section className="section section-black min-h-screen flex items-center justify-center">
-        <div className="container text-center">
-          <p className="text-caption opacity-50 mb-8 fade-up">
-            TWENTYOZ R&D TEAM · 2025 Annual Review
+      <section className="section section-black min-h-screen flex items-center justify-center py-0">
+        <div className="container-full text-center px-8">
+          <p className="title-hero-sub opacity-60 mb-6 fade-up">
+            TWENTYOZ  R&D  TEAM
           </p>
           <h1 className="title-hero">
             <span className="split-line"><span>RE:WIND</span></span>
-            <br />
-            <span className="split-line"><span>2025</span></span>
           </h1>
-          <div className="h-[1px] bg-white/20 w-24 mx-auto my-12 line-reveal"></div>
-          <p className="text-body opacity-50 max-w-[50rem] mx-auto fade-up">
-            메타버스에서 AI까지, 경계를 넘어선 한 해
+          <p className="title-section opacity-30 mt-2">
+            <span className="split-line"><span>2025</span></span>
           </p>
         </div>
       </section>

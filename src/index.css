@@ -38,10 +38,18 @@ body {
 /* Hero Title: MASSIVE, BLACK weight, fills screen */
 .title-hero {
   font-family: "Bebas Neue", sans-serif;
-  font-size: clamp(10rem, 20vw, 25rem);
+  font-size: clamp(14rem, 28vw, 35rem);
   font-weight: var(--w-black);
-  line-height: 1;
+  line-height: 0.9;
   letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+/* Hero subtitle - matches hero width with wide letter-spacing */
+.title-hero-sub {
+  font-size: clamp(1.6rem, 2.5vw, 3rem);
+  font-weight: var(--w-light);
+  letter-spacing: 0.5em;
   text-transform: uppercase;
 }
 
@@ -243,7 +251,12 @@ body {
   .nav { padding: 2rem 3rem; }
 
   .title-hero {
-    font-size: clamp(6rem, 16vw, 12rem);
+    font-size: clamp(8rem, 20vw, 16rem);
+  }
+
+  .title-hero-sub {
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    letter-spacing: 0.3em;
   }
 
   .title-section {
